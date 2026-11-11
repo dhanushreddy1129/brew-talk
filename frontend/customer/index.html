@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brew Talk — Order</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/shared/css/tokens.css" />
+  <link rel="stylesheet" href="/static/shared/css/base.css" />
+  <link rel="stylesheet" href="/static/customer/css/style.css" />
+</head>
+<body>
+
+<!-- Header -->
+<header class="app-header" role="banner">
+  <div class="header-left">
+    <a href="/landing" class="back-link" title="Back to tables / scan" aria-label="Change table">‹</a>
+    <span class="cafe-logo" aria-hidden="true">☕</span>
+    <div>
+      <div class="header-title cafe-name">Brew Talk</div>
+      <div class="header-subtitle">Voice-Order QR Cafe</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <span class="table-badge" id="tableBadge" aria-label="Table number">Table 1</span>
+    <button class="icon-btn" id="themeToggle" aria-label="Toggle dark mode" title="Toggle theme">🌙</button>
+  </div>
+</header>
+
+<main>
+  <!-- Voice Section -->
+  <section class="voice-section" aria-label="Voice ordering">
+    <div class="voice-top">
+      <div class="barista-wrap" aria-hidden="true">
+        <div class="barista-avatar">👨‍🍳</div>
+      </div>
+      <div id="speechBubble" class="speech-bubble" role="status" aria-live="polite">
+        Welcome to Brew Talk! Tap 🎙 and speak your complete order — e.g. <em>"2 Masala Dosa and a Filter Coffee"</em>. Tap 🛑 when done ☕
+      </div>
+    </div>
+
+    <!-- Live Audio Waveform (visible when listening) -->
+    <div id="voiceWaveform" class="voice-waveform" style="display:none;" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="voice-controls">
+      <select id="langSelect" class="lang-select" aria-label="Select language">
+        <option value="en-US" selected>🇬🇧 English</option>
+        <option value="en-IN">🇮🇳 English (India)</option>
+        <option value="hi-IN">🇮🇳 Hindi (हिन्दी)</option>
+        <option value="kn-IN">🇮🇳 Kannada (ಕನ್ನಡ)</option>
+        <option value="ta-IN">🇮🇳 Tamil (தமிழ்)</option>
+        <option value="te-IN">🇮🇳 Telugu (తెలుగు)</option>
+      </select>
+
+      <div style="flex:1; min-width:0;">
+        <div id="transcriptText" class="transcript-text" aria-live="polite"></div>
+        <div id="transcriptHint" class="transcript-hint">Tap 🎙 to start, speak your full order, then tap 🛑 to send</div>
+      </div>
+
+      <button id="micBtn" class="mic-btn" aria-label="Start voice ordering" title="Tap to speak">
+        <div class="mic-steam" aria-hidden="true"><span></span><span></span><span></span></div>
+        <span id="micIcon">🎙</span>
+      </button>
+    </div>
+
+    <!-- Quick test voice prompts for one-tap voice testing -->
+    <div class="quick-prompts-bar">
+      <span style="font-size:11px; opacity:0.7; align-self:center;">Try:</span>
+      <button class="prompt-chip" onclick="simulateVoice('two butter naan and one chilli paneer')">🫓 2 Butter Naan + Chilli Paneer</button>
+      <button class="prompt-chip" onclick="simulateVoice('2 masala dosa and 1 filter coffee')">☕ 2 Dosa + Filter Coffee</button>
+      <button class="prompt-chip" onclick="simulateVoice('two paneer tikka and one hakka noodles')">🧀 2 Paneer Tikka + Noodles</button>
+      <button class="prompt-chip" onclick="simulateVoice('1 biscoff frappe and 1 sizzling brownie')">🥤 Biscoff Frappe + Brownie</button>
+    </div>
+
+    <!-- Typed fallback -->
+    <div id="typedWrap" class="typed-input-wrap">
+      <input id="typedInput" type="text" class="typed-input" placeholder="Type order in English (e.g. 2 filter coffee, 1 butter naan)..." aria-label="Type your order" />
+      <button id="typedSendBtn" class="typed-send-btn" aria-label="Send order">Send</button>
+    </div>
+  </section>
+
+  <!-- Search & Category Filters -->
+  <div class="menu-filter-bar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="menuSearch" class="search-input" placeholder="Search menu items (e.g. dosa, chai, meals)..." aria-label="Search menu" />
+      <button id="clearSearch" class="clear-search" style="display:none;" aria-label="Clear search">✕</button>
+    </div>
+    <nav id="categoryBar" class="category-bar" aria-label="Menu categories" role="navigation"></nav>
+  </div>
+
+  <!-- Menu items grid -->
+  <section id="menuSection" class="menu-section" aria-label="Menu items">
+    <div id="menuGrid" class="menu-grid">
+      <!-- Skeleton placeholders will be injected by JS -->
+    </div>
+  </section>
+
+  <!-- Order Tracker -->
+  <section id="trackerWrap" class="tracker-wrap" aria-label="Order tracker">
+    <h2 class="tracker-title">Your Order Status ☕</h2>
+
+    <div class="cup-tracker">
+      <div class="cup-svg-wrap" aria-hidden="true">
+        <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="cupClip">
+              <path d="M20 35 L28 100 Q29 108 36 108 L84 108 Q91 108 92 100 L100 35 Z" />
+            </clipPath>
+          </defs>
+          <!-- Cup background -->
+          <path d="M20 35 L28 100 Q29 108 36 108 L84 108 Q91 108 92 100 L100 35 Z"
+            fill="var(--color-bg)" stroke="var(--color-secondary)" stroke-width="2.5"/>
+          <!-- Fill level -->
+          <g clip-path="url(#cupClip)">
+            <rect id="cupFill" x="20" y="108" width="80" height="80"
+              fill="var(--color-primary)" style="height:0%;transition:height 0.8s ease;transform-origin:bottom;transform:translateY(0)"/>
+          </g>
+          <!-- Handle -->
+          <path d="M100 50 Q118 50 118 68 Q118 86 100 86"
+            fill="none" stroke="var(--color-secondary)" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- Rim -->
+          <ellipse cx="60" cy="35" rx="40" ry="6"
+            fill="var(--color-surface)" stroke="var(--color-secondary)" stroke-width="2"/>
+          <!-- Steam -->
+          <g opacity="0.6">
+            <path class="steam-line" d="M48 20 Q44 14 48 8 Q52 2 48 -4" fill="none" stroke="var(--color-secondary)" stroke-width="2" stroke-linecap="round"/>
+            <path class="steam-line" d="M60 22 Q56 16 60 10 Q64 4 60 -2" fill="none" stroke="var(--color-secondary)" stroke-width="2" stroke-linecap="round"/>
+            <path class="steam-line" d="M72 20 Q68 14 72 8 Q76 2 72 -4" fill="none" stroke="var(--color-secondary)" stroke-width="2" stroke-linecap="round"/>
+          </g>
+        </svg>
+      </div>
+
+      <div id="trackerSteps" style="display:flex;align-items:center;width:100%;justify-content:center;flex-wrap:wrap;gap:4px;padding:0 8px;margin-top:16px;">
+        <!-- Steps injected by JS -->
+      </div>
+    </div>
+
+    <div class="tracker-order-info">
+      <div class="tracker-order-num" id="trackerOrderNum"></div>
+      <div style="color:var(--color-text-light);font-size:var(--text-sm);margin-top:6px;">
+        Current Status: <strong id="trackerStatus" style="color:var(--color-accent); font-size:16px;"></strong>
+      </div>
+      <div style="font-size:var(--text-sm);margin-top:4px;">
+        Order Total: <strong id="trackerTotal" style="color:var(--color-primary); font-size:16px;"></strong>
+      </div>
+    </div>
+
+    <button class="new-order-btn" onclick="location.reload()" aria-label="Start a new order">
+      + Place Another Order
+    </button>
+  </section>
+</main>
+
+<!-- Sticky Cart Bar -->
+<div id="cartBar" class="cart-bar" role="complementary" aria-label="Cart summary" tabindex="0"
+     onkeydown="if(event.key==='Enter')document.getElementById('cartBar').click()">
+  <div class="cart-bar-left">
+    <span class="cart-count" id="cartCount" aria-label="Items in cart">0</span>
+    <span class="cart-label">Your Cafe Tray</span>
+  </div>
+  <div style="display:flex; align-items:center; gap:10px;">
+    <span class="cart-total" id="cartTotal" aria-live="polite">₹0.00</span>
+    <span class="cart-arrow" aria-hidden="true">▲</span>
+  </div>
+</div>
+
+<!-- Cart Overlay -->
+<div id="cartOverlay" class="cart-overlay" role="presentation"></div>
+
+<!-- Cart Sheet (Kraft Paper Receipt style) -->
+<div id="cartSheet" class="cart-sheet" role="dialog" aria-label="Cart" aria-modal="true">
+  <div class="receipt">
+    <div class="receipt-drag-handle" aria-hidden="true"></div>
+    <div class="receipt-header">
+      <div class="receipt-title">Brew Talk 🧾</div>
+      <div class="receipt-subtitle cafe-tagline">Artisanal Voice-Order Cafe</div>
+      <div style="font-size:12px; color:var(--color-text-light); margin-top:4px;" id="receiptTableLabel">Table 1</div>
+    </div>
+
+    <div id="receiptItems" class="receipt-items" aria-label="Cart items">
+      <!-- Injected by JS -->
+    </div>
+
+    <label class="note-label" for="orderNote">Chef / Barista Note</label>
+    <textarea id="orderNote" class="note-field"
+      placeholder="e.g. Less spicy, strong coffee, no sugar..."
+      aria-label="Chef or Barista instructions"></textarea>
+
+    <div class="receipt-totals" aria-label="Price breakdown">
+      <div class="total-row">
+        <span>Items Subtotal</span>
+        <span id="subtotalVal">₹0.00</span>
+      </div>
+      <div class="total-row">
+        <span>GST (computed on server)</span>
+        <span id="taxVal">₹0.00</span>
+      </div>
+      <div class="total-row">
+        <span>Service Charge</span>
+        <span id="scVal">₹0.00</span>
+      </div>
+      <div class="total-row grand">
+        <span>Grand Total</span>
+        <span id="grandTotalVal">₹0.00</span>
+      </div>
+    </div>
+
+    <button id="placeOrderBtn" class="place-order-btn" onclick="placeOrder()" aria-label="Place order">
+      Place Order to Kitchen ☕
+    </button>
+  </div>
+</div>
+
+<!-- Celebration container -->
+<div id="celebration" class="celebration" aria-hidden="true"></div>
+
+<script type="module" src="/static/customer/js/app.js"></script>
+</body>
+</html>

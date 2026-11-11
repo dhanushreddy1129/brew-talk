@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Brew Talk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/shared/css/tokens.css" />
+  <link rel="stylesheet" href="/static/shared/css/base.css" />
+  <link rel="stylesheet" href="/static/admin/css/style.css" />
+  <!-- QR Code library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+<!-- Password Gate -->
+<div id="passwordGate" class="password-gate" role="dialog" aria-modal="true" aria-label="Admin login" style="display:none;">
+  <div class="gate-card">
+    <div style="font-size:48px;margin-bottom:var(--space-sm)">⚙️</div>
+    <div class="gate-title">Admin Panel</div>
+    <div class="gate-sub">Enter your admin password to continue.</div>
+    <input id="gateInput" type="password" class="gate-input"
+      placeholder="Admin password" aria-label="Admin password" autocomplete="current-password" />
+    <button class="gate-btn" onclick="submitGate()">Enter Admin</button>
+    <div id="gateError" class="gate-error" role="alert" aria-live="polite"></div>
+  </div>
+</div>
+
+<div class="admin-layout">
+  <!-- Header -->
+  <header class="admin-header" role="banner">
+    <div>
+      <div class="admin-title">⚙️ Admin Panel</div>
+      <div class="admin-subtitle cafe-name admin-cafe-name">Brew Talk</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="icon-btn" id="themeToggle" aria-label="Toggle dark mode"
+        style="color:white;background:rgba(255,255,255,0.1);">🌙</button>
+      <a href="/" class="icon-btn" aria-label="Go to landing"
+        style="color:white;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;font-size:18px;text-decoration:none;">🏠</a>
+    </div>
+  </header>
+
+  <!-- Tab Nav -->
+  <nav class="tab-nav" role="tablist" aria-label="Admin sections">
+    <button class="tab-btn active" data-tab="menu" onclick="activateTab('menu')" role="tab">📋 Menu</button>
+    <button class="tab-btn" data-tab="settings" onclick="activateTab('settings')" role="tab">🎨 Settings</button>
+    <button class="tab-btn" data-tab="qr" onclick="activateTab('qr')" role="tab">🔲 QR Codes</button>
+    <button class="tab-btn" data-tab="stats" onclick="activateTab('stats')" role="tab">📊 Stats</button>
+    <button class="tab-btn" data-tab="events" onclick="activateTab('events')" role="tab">📡 Live Events</button>
+  </nav>
+
+  <!-- ── Menu Tab ── -->
+  <section id="tab-menu" class="tab-panel active" role="tabpanel" aria-label="Menu management">
+    <div class="section-header">
+      <div class="section-title">Menu Items</div>
+      <button class="add-new-btn" onclick="showAddForm()">+ Add Item</button>
+    </div>
+
+    <!-- Add/Edit Form -->
+    <div id="itemFormWrap" class="form-card" style="display:none;">
+      <div id="formTitle" class="form-title">+ Add Menu Item</div>
+      <form id="itemForm" onsubmit="event.preventDefault(); saveItem();">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="itemName">Name *</label>
+            <input id="itemName" type="text" class="form-input" placeholder="e.g. Filter Coffee" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="itemCategory">Category *</label>
+            <input id="itemCategory" type="text" class="form-input" placeholder="e.g. Beverages" required list="categoryList" />
+            <datalist id="categoryList"></datalist>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="itemPrice">Price *</label>
+            <input id="itemPrice" type="number" class="form-input" placeholder="e.g. 40" min="0" step="0.5" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="itemEmoji">Emoji</label>
+            <input id="itemEmoji" type="text" class="form-input" placeholder="e.g. ☕" maxlength="4" />
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <label class="form-label" for="itemDescription">Description</label>
+            <textarea id="itemDescription" class="form-textarea" placeholder="Short description…"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="itemImageUrl">Image URL (optional)</label>
+            <input id="itemImageUrl" type="url" class="form-input" placeholder="https://…" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="itemSortOrder">Sort Order</label>
+            <input id="itemSortOrder" type="number" class="form-input" value="0" />
+          </div>
+          <div class="form-group" style="justify-content:flex-end;padding-top:20px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+              <input id="itemAvailable" type="checkbox" checked style="width:18px;height:18px;" />
+              <span style="font-weight:600;">Available</span>
+            </label>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button id="saveItemBtn" type="submit" class="save-btn">Save Item</button>
+          <button type="button" class="cancel-btn" onclick="cancelForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="data-table-wrap">
+      <table class="data-table" aria-label="Menu items">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Available</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="menuTableBody">
+          <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--color-text-light)">Loading menu…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── Settings Tab ── -->
+  <section id="tab-settings" class="tab-panel" role="tabpanel" aria-label="Settings editor">
+    <div class="section-title" style="margin-bottom:var(--space-md);">🎨 Settings</div>
+    <div id="settingsContainer">
+      <p style="color:var(--color-text-light)">Loading settings…</p>
+    </div>
+  </section>
+
+  <!-- ── QR Tab ── -->
+  <section id="tab-qr" class="tab-panel" role="tabpanel" aria-label="QR codes">
+    <div class="section-header">
+      <div class="section-title">🔲 Table QR Codes</div>
+      <button class="qr-print-btn" onclick="printQR()">🖨 Print All</button>
+    </div>
+    <div id="qrGrid" class="qr-grid">
+      <p style="color:var(--color-text-light)">Loading…</p>
+    </div>
+  </section>
+
+  <!-- ── Stats Tab ── -->
+  <section id="tab-stats" class="tab-panel" role="tabpanel" aria-label="Statistics" id="statsContent">
+    <div class="section-title" style="margin-bottom:var(--space-md);">📊 24-Hour Stats</div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-card-icon">📋</span>
+        <span class="stat-card-label">Total Orders</span>
+        <span class="stat-card-value" id="statOrders">—</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-icon">💰</span>
+        <span class="stat-card-label">Revenue</span>
+        <span class="stat-card-value" id="statRevenue">—</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-icon">🧾</span>
+        <span class="stat-card-label">Avg Order Value</span>
+        <span class="stat-card-value" id="statAvg">—</span>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-lg);flex-wrap:wrap;">
+      <div>
+        <div style="font-weight:600;margin-bottom:var(--space-sm);">By Status</div>
+        <div class="top-items-list" id="statByStatus">Loading…</div>
+      </div>
+      <div>
+        <div style="font-weight:600;margin-bottom:var(--space-sm);">Top Items</div>
+        <div class="top-items-list" id="statTopItems">Loading…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Live Events Tab ── -->
+  <section id="tab-events" class="tab-panel" role="tabpanel" aria-label="Live events">
+    <div class="section-header">
+      <div class="section-title">📡 Live Events</div>
+      <button onclick="document.getElementById('eventsLog').innerHTML=''"
+        style="padding:8px 16px;border:1.5px solid var(--color-secondary);border-radius:var(--radius-sm);font-size:var(--text-sm);min-height:36px;">
+        Clear
+      </button>
+    </div>
+    <div id="eventsLog" class="events-log" aria-live="polite" role="log">
+      <div class="event-line" style="opacity:0.5;">Waiting for events… WebSocket connected.</div>
+    </div>
+  </section>
+</div>
+
+<script type="module" src="/static/admin/js/app.js"></script>
+<script>
+  // Populate category datalist after menu loads
+  document.addEventListener('DOMContentLoaded', () => {
+    // This will be populated by the app.js when menu items are loaded
+    window.addEventListener('menuLoaded', (e) => {
+      const dl = document.getElementById('categoryList');
+      if (!dl) return;
+      const cats = [...new Set((e.detail || []).map(i => i.category))];
+      dl.innerHTML = cats.map(c => `<option value="${c}">`).join('');
+    });
+  });
+</script>
+</body>
+</html>

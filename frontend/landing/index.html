@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brew Talk — Artisanal Voice-Order Cafe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/shared/css/tokens.css" />
+  <link rel="stylesheet" href="/static/shared/css/base.css" />
+  <!-- QR Code library for rendering table stands -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --hero-pattern: radial-gradient(#D4A574 0.75px, transparent 0.75px);
+    }
+
+    body {
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .brand-mark {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .brand-logo-badge {
+      width: 44px;
+      height: 44px;
+      background: var(--color-primary);
+      color: #FFF;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 12px rgba(60, 36, 21, 0.2);
+    }
+    .brand-text h1 {
+      font-family: var(--font-display);
+      font-size: 22px;
+      color: var(--color-primary);
+      margin: 0;
+      line-height: 1.1;
+      font-weight: 700;
+    }
+    .brand-text span {
+      font-size: 11px;
+      color: var(--color-text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .theme-btn, .staff-btn {
+      border: 1.5px solid var(--color-secondary);
+      background: var(--color-surface);
+      color: var(--color-text);
+      padding: 8px 14px;
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition-fast);
+      min-height: 38px;
+    }
+    .theme-btn:hover, .staff-btn:hover {
+      background: var(--color-primary);
+      color: #FFF;
+      border-color: var(--color-primary);
+    }
+
+    /* Hero Section */
+    .hero {
+      max-width: 1100px;
+      margin: 20px auto 40px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 40px;
+      align-items: center;
+    }
+    @media (max-width: 860px) {
+      .hero { grid-template-columns: 1fr; margin-top: 10px; text-align: center; }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: rgba(127, 182, 133, 0.18);
+      color: #2e6935;
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      border: 1px solid rgba(127, 182, 133, 0.35);
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(34px, 5vw, 54px);
+      line-height: 1.12;
+      color: var(--color-primary);
+      margin-bottom: 18px;
+      font-weight: 700;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--color-secondary);
+    }
+    .hero-desc {
+      font-size: 17px;
+      line-height: 1.6;
+      color: var(--color-text-light);
+      margin-bottom: 28px;
+      max-width: 520px;
+    }
+
+    /* Action Box */
+    .action-card {
+      background: var(--color-surface);
+      border: 1px solid rgba(212, 165, 116, 0.3);
+      box-shadow: 0 12px 36px rgba(44, 24, 16, 0.08);
+      border-radius: 24px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .action-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-secondary), var(--color-accent));
+    }
+
+    .cta-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .btn-scan {
+      background: var(--color-primary);
+      color: #FFF;
+      padding: 16px 24px;
+      border-radius: 16px;
+      font-size: 17px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 8px 20px rgba(60, 36, 21, 0.25);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border: none;
+    }
+    .btn-scan:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(60, 36, 21, 0.35);
+    }
+
+    .divider-text {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 18px 0;
+      color: var(--color-text-light);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .divider-text::before, .divider-text::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px dashed var(--color-secondary);
+      opacity: 0.5;
+    }
+    .divider-text span {
+      padding: 0 12px;
+    }
+
+    .table-picker-row {
+      display: flex;
+      gap: 10px;
+    }
+    .table-select {
+      flex: 1;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1.5px solid var(--color-secondary);
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .btn-go {
+      background: var(--color-accent);
+      color: #FFF;
+      border: none;
+      padding: 14px 22px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform var(--transition-fast);
+    }
+    .btn-go:hover { transform: scale(1.04); }
+
+    /* Interactive QR Stand Showcase */
+    .qr-showcase {
+      max-width: 1100px;
+      margin: 20px auto 60px;
+      padding: 0 20px;
+    }
+    .showcase-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .showcase-header h2 {
+      font-family: var(--font-display);
+      font-size: 28px;
+      color: var(--color-primary);
+      margin-bottom: 6px;
+    }
+    .showcase-header p {
+      color: var(--color-text-light);
+      font-size: 15px;
+    }
+
+    .tables-scroll-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 16px;
+    }
+    .table-tent-card {
+      background: var(--color-surface);
+      border: 1.5px solid var(--color-secondary);
+      border-radius: 16px;
+      padding: 16px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-bounce);
+      box-shadow: 0 4px 12px rgba(44, 24, 16, 0.05);
+      position: relative;
+    }
+    .table-tent-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      border-color: var(--color-primary);
+      box-shadow: 0 12px 24px rgba(60, 36, 21, 0.15);
+    }
+    .tent-table-no {
+      font-family: var(--font-display);
+      font-weight: 700;
+      color: var(--color-primary);
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    .tent-qr-box {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 10px;
+      background: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      padding: 4px;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+    .tent-scan-hint {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-accent);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Modal for Scanner */
+    .scanner-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(26, 18, 11, 0.85);
+      backdrop-filter: blur(6px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .scanner-modal-overlay.active { display: flex; }
+    .scanner-box {
+      background: var(--color-surface);
+      border-radius: 28px;
+      max-width: 440px;
+      width: 100%;
+      padding: 28px;
+      text-align: center;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+      position: relative;
+      animation: modal-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes modal-pop {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .scanner-close {
+      position: absolute;
+      top: 18px; right: 18px;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: var(--color-bg);
+      font-size: 18px;
+      cursor: pointer;
+      color: var(--color-text);
+    }
+    .viewfinder {
+      position: relative;
+      width: 260px;
+      height: 260px;
+      margin: 20px auto;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #000;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      border: 3px solid var(--color-secondary);
+    }
+    .viewfinder video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .laser-line {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: #4CAF50;
+      box-shadow: 0 0 12px #4CAF50;
+      animation: scan-laser 2s infinite ease-in-out;
+    }
+    @keyframes scan-laser {
+      0% { top: 10%; }
+      50% { top: 90%; }
+      100% { top: 10%; }
+    }
+    .scanner-corners {
+      position: absolute;
+      inset: 16px;
+      border: 2px dashed rgba(255,255,255,0.7);
+      border-radius: 12px;
+      pointer-events: none;
+    }
+
+    /* Staff Modal */
+    .staff-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(26, 18, 11, 0.85);
+      backdrop-filter: blur(6px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .staff-modal.active { display: flex; }
+    .staff-box {
+      background: var(--color-surface);
+      border-radius: 24px;
+      max-width: 360px;
+      width: 100%;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 20px 48px rgba(0,0,0,0.4);
+      position: relative;
+    }
+    .staff-portal-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all var(--transition-fast);
+    }
+    .btn-kitchen { background: #E65100; color: #FFF; }
+    .btn-admin { background: var(--color-primary); color: #FFF; }
+    .btn-kitchen:hover, .btn-admin:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* Features section */
+    .features-strip {
+      background: var(--color-surface);
+      padding: 40px 20px;
+      border-top: 1px solid rgba(212, 165, 116, 0.2);
+      border-bottom: 1px solid rgba(212, 165, 116, 0.2);
+    }
+    .features-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 28px;
+    }
+    .feat-card {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .feat-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--color-bg);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+      border: 1px solid var(--color-secondary);
+    }
+    .feat-card h3 {
+      font-family: var(--font-display);
+      font-size: 18px;
+      color: var(--color-primary);
+      margin-bottom: 4px;
+    }
+    .feat-card p {
+      font-size: 13.5px;
+      color: var(--color-text-light);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="top-bar">
+    <a href="/landing" class="brand-mark" aria-label="Brew Talk Home">
+      <div class="brand-logo-badge">☕</div>
+      <div class="brand-text">
+        <h1 class="cafe-name">Brew Talk</h1>
+        <span class="cafe-tagline">Voice-Order QR Cafe</span>
+      </div>
+    </a>
+    <div class="top-actions">
+      <button class="theme-btn" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      <button class="staff-btn" onclick="openStaffModal()">🔒 Staff</button>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <main class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">✨ Tap to Speak • Instant Order</div>
+      <h2 class="hero-title">
+        Order in your voice, <br />
+        <em>sip with joy.</em>
+      </h2>
+      <p class="hero-desc">
+        Take a seat at any table and scan its QR stand to unlock our live voice menu. Tell our friendly AI barista what you're craving in Hindi, English, Kannada, Tamil, or Telugu.
+      </p>
+
+      <div class="action-card">
+        <div class="cta-buttons">
+          <button class="btn-scan" onclick="openScanner()">
+            <span style="font-size:22px;">📷</span>
+            <span>Scan Table QR Code</span>
+          </button>
+        </div>
+
+        <div class="divider-text">
+          <span>Or select table directly</span>
+        </div>
+
+        <div class="table-picker-row">
+          <select id="tableSelect" class="table-select" aria-label="Choose table">
+            <option value="1">Table 1 (Window Booth)</option>
+            <option value="2">Table 2 (Patio)</option>
+            <option value="3">Table 3 (Espresso Bar)</option>
+            <option value="4">Table 4 (Garden View)</option>
+            <option value="5">Table 5 (Corner Couch)</option>
+            <option value="6">Table 6</option>
+            <option value="7">Table 7</option>
+            <option value="8">Table 8</option>
+            <option value="9">Table 9</option>
+            <option value="10">Table 10</option>
+            <option value="11">Table 11</option>
+            <option value="12">Table 12</option>
+          </select>
+          <button class="btn-go" onclick="goToSelectedTable()">Open Menu →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visual showcase card -->
+    <div style="display:flex; justify-content:center;">
+      <div style="background:var(--color-surface); padding:24px; border-radius:28px; box-shadow:var(--shadow-lg); border:1.5px solid var(--color-secondary); max-width:380px; width:100%; text-align:center;">
+        <div style="position:relative; border-radius:20px; overflow:hidden; margin-bottom:18px;">
+          <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=700&q=80" alt="Brew Talk Cafe interior" style="width:100%; height:220px; object-fit:cover;" />
+          <div style="position:absolute; bottom:12px; left:12px; right:12px; background:rgba(26,18,11,0.75); backdrop-filter:blur(6px); color:#FFF; padding:8px 14px; border-radius:12px; font-size:13px; font-weight:600; display:flex; align-items:center; justify-content:space-between;">
+            <span>👨‍🍳 Barista Arjun is ready</span>
+            <span style="color:#7FB685;">● Online</span>
+          </div>
+        </div>
+        <p style="font-size:14px; color:var(--color-text-light); line-height:1.5; margin:0;">
+          "2 masala dosa aur ek filter coffee please" — speak naturally and your cart builds itself in real-time.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Interactive QR Table Stands Gallery -->
+  <section class="qr-showcase">
+    <div class="showcase-header">
+      <h2>🪑 Click Any Table Stand to Scan & Enter</h2>
+      <p>Simulate sitting at a cafe table by clicking any table stand below.</p>
+    </div>
+    <div id="tableTentsGrid" class="tables-scroll-grid">
+      <!-- Dynamic QR table stands injected via JS -->
+    </div>
+  </section>
+
+  <!-- Features Strip -->
+  <section class="features-strip">
+    <div class="features-inner">
+      <div class="feat-card">
+        <div class="feat-icon">🎙️</div>
+        <div>
+          <h3>5 Indian Languages</h3>
+          <p>Order seamlessly in English, Hindi, Kannada, Tamil, or Telugu. The AI barista responds in your tongue.</p>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⚡</div>
+        <div>
+          <h3>Live Kitchen Sync</h3>
+          <p>Orders beep straight into the kitchen ticket rail. Follow along with your live coffee-filling status tracker.</p>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🧾</div>
+        <div>
+          <h3>Live Price Engine</h3>
+          <p>Server-side calculated quotes with GST & service charge. Zero price tampering possible.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Camera Scanner Modal -->
+  <div id="scannerModal" class="scanner-modal-overlay">
+    <div class="scanner-box">
+      <button class="scanner-close" onclick="closeScanner()" aria-label="Close scanner">✕</button>
+      <h3 style="font-family:var(--font-display); font-size:22px; color:var(--color-primary); margin-bottom:6px;">Scan Table QR Code</h3>
+      <p style="font-size:13px; color:var(--color-text-light);">Point your camera at the QR code stand on your table</p>
+
+      <div class="viewfinder">
+        <video id="scannerVideo" playsinline autoplay muted></video>
+        <div class="laser-line"></div>
+        <div class="scanner-corners"></div>
+      </div>
+
+      <div style="font-size:13px; color:var(--color-text-light); margin-top:8px;">
+        Camera active. Or choose a quick test table:
+      </div>
+      <div style="display:flex; justify-content:center; gap:8px; margin-top:12px; flex-wrap:wrap;">
+        <button onclick="simulateScan(1)" class="staff-btn">Table 1</button>
+        <button onclick="simulateScan(3)" class="staff-btn">Table 3</button>
+        <button onclick="simulateScan(5)" class="staff-btn">Table 5</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Staff Portal Modal -->
+  <div id="staffModal" class="staff-modal">
+    <div class="staff-box">
+      <button class="scanner-close" onclick="closeStaffModal()" aria-label="Close modal">✕</button>
+      <div style="font-size:36px; margin-bottom:8px;">🔐</div>
+      <h3 style="font-family:var(--font-display); font-size:20px; color:var(--color-primary); margin-bottom:6px;">Staff Access</h3>
+      <p style="font-size:13px; color:var(--color-text-light); margin-bottom:16px;">Protected portal for cafe operations & kitchen</p>
+      
+      <a href="/kitchen" class="staff-portal-btn btn-kitchen">🍳 Open Kitchen Board</a>
+      <a href="/admin" class="staff-portal-btn btn-admin">⚙️ Open Admin Dashboard</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { loadConfig, applyBranding, initTheme, toggleTheme } from '/static/shared/js/theme.js';
+
+    initTheme();
+    updateThemeIcon();
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      toggleTheme();
+      updateThemeIcon();
+    });
+
+    function updateThemeIcon() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+    }
+
+    async function init() {
+      try {
+        const config = await loadConfig();
+        applyBranding(config);
+        renderTableTents(parseInt(config.total_tables || '12', 10));
+      } catch (err) {
+        renderTableTents(12);
+      }
+    }
+
+    function renderTableTents(total) {
+      const container = document.getElementById('tableTentsGrid');
+      container.innerHTML = '';
+      for (let i = 1; i <= total; i++) {
+        const card = document.createElement('div');
+        card.className = 'table-tent-card';
+        card.onclick = () => simulateScan(i);
+        card.innerHTML = `
+          <div class="tent-table-no">Table ${i}</div>
+          <div class="tent-qr-box" id="qrStand_${i}"></div>
+          <div class="tent-scan-hint">Tap to Order →</div>
+        `;
+        container.appendChild(card);
+
+        // Generate small scannable QR
+        setTimeout(() => {
+          if (window.QRCode) {
+            new QRCode(document.getElementById(`qrStand_${i}`), {
+              text: `${location.origin}/m/${i}`,
+              width: 90,
+              height: 90,
+              colorDark: "#3C2415",
+              colorLight: "#FFFFFF",
+              correctLevel: QRCode.CorrectLevel.M
+            });
+          }
+        }, 50);
+      }
+    }
+
+    window.goToSelectedTable = function() {
+      const val = document.getElementById('tableSelect').value;
+      window.location.href = `/m/${val}`;
+    };
+
+    window.simulateScan = function(tableNo) {
+      playBeep();
+      window.location.href = `/m/${tableNo}`;
+    };
+
+    let videoStream = null;
+    window.openScanner = async function() {
+      const modal = document.getElementById('scannerModal');
+      modal.classList.add('active');
+      const video = document.getElementById('scannerVideo');
+      try {
+        videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        video.srcObject = videoStream;
+      } catch (e) {
+        console.log('Camera access unavailable, fallback to click-to-scan buttons');
+      }
+    };
+
+    window.closeScanner = function() {
+      document.getElementById('scannerModal').classList.remove('active');
+      if (videoStream) {
+        videoStream.getTracks().forEach(t => t.stop());
+        videoStream = null;
+      }
+    };
+
+    window.openStaffModal = function() {
+      document.getElementById('staffModal').classList.add('active');
+    };
+    window.closeStaffModal = function() {
+      document.getElementById('staffModal').classList.remove('active');
+    };
+
+    function playBeep() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(1200, ctx.currentTime);
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.15);
+      } catch (_) {}
+    }
+
+    init();
+  </script>
+</body>
+</html>

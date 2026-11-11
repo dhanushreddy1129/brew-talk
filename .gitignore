@@ -1,0 +1,34 @@
+# Virtual Environment
+venv/
+env/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment variables & secrets
+.env
+backend/.env
+*.local
+
+# Database (keep schema in code, don't commit runtime DB)
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store

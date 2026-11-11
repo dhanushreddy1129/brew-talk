@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kitchen — Brew Talk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/shared/css/tokens.css" />
+  <link rel="stylesheet" href="/static/shared/css/base.css" />
+  <link rel="stylesheet" href="/static/kitchen/css/style.css" />
+</head>
+<body>
+
+<!-- Password Gate -->
+<div id="passwordGate" class="password-gate" role="dialog" aria-modal="true" aria-label="Kitchen login">
+  <div class="gate-card">
+    <div style="font-size:48px;margin-bottom:var(--space-sm)">🍳</div>
+    <div class="gate-title">Kitchen Board</div>
+    <div class="gate-sub">Enter the kitchen password to continue.</div>
+    <input id="gateInput" type="password" class="gate-input"
+      placeholder="Password" aria-label="Kitchen password" />
+    <button class="gate-btn" onclick="submitGate()">Enter Kitchen</button>
+    <div id="gateError" class="gate-error" role="alert" aria-live="polite"></div>
+  </div>
+</div>
+
+<div class="kitchen-layout">
+  <!-- Header -->
+  <header class="kitchen-header" role="banner">
+    <div class="kitchen-title">
+      🍳 Kitchen Board
+    </div>
+    <div class="kitchen-meta">
+      <span class="live-dot" aria-hidden="true"></span>
+      <span id="orderCount">Loading…</span>
+      <span id="currentTime"></span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="icon-btn" id="themeToggle" aria-label="Toggle dark mode"
+        style="color:white;background:rgba(255,255,255,0.1);">🌙</button>
+      <a href="/" class="icon-btn" aria-label="Go to landing"
+        style="color:white;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;font-size:18px;">🏠</a>
+    </div>
+  </header>
+
+  <!-- Ticket Rail -->
+  <div class="ticket-rail" aria-hidden="true"></div>
+
+  <!-- Board -->
+  <div id="kitchenBoard" class="kitchen-board" aria-label="Orders board" role="main">
+    <!-- Columns injected by JS -->
+    <div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--color-text-light);">
+      Loading orders…
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/static/kitchen/js/app.js"></script>
+<script>
+  // Live clock
+  function updateClock() {
+    const el = document.getElementById('currentTime');
+    if (el) {
+      el.textContent = new Date().toLocaleTimeString('en-IN', {
+        hour: '2-digit', minute: '2-digit', hour12: true
+      });
+    }
+  }
+  updateClock();
+  setInterval(updateClock, 60000);
+</script>
+</body>
+</html>

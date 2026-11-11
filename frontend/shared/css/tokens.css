@@ -1,0 +1,129 @@
+/* ============================================
+   Brew Talk — Design Tokens
+   ============================================
+   Defaults overridden at runtime from /api/config
+   ============================================ */
+
+:root {
+  /* Brand — overridden from /api/config */
+  --color-primary: #3C2415;
+  --color-secondary: #D4A574;
+  --color-accent: #7FB685;
+  --color-bg: #FDF6EC;
+  --color-surface: #FFFFFF;
+  --color-text: #2C1810;
+  --color-text-light: #8B7355;
+
+  /* Derived */
+  --color-primary-light: #5C3D2E;
+  --color-primary-dark: #2A1A0E;
+  --color-secondary-light: #E4C49E;
+  --color-accent-light: #A8D4AE;
+  --color-danger: #D94F4F;
+  --color-danger-light: #FDEAEA;
+  --color-success: #4CAF50;
+  --color-success-light: #E8F5E9;
+  --color-warning: #F5A623;
+  --color-warning-light: #FFF3E0;
+  --color-info: #2196F3;
+  --color-info-light: #E3F2FD;
+
+  /* Typography */
+  --font-display: 'Fraunces', 'Georgia', serif;
+  --font-body: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+
+  /* Font sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+
+  /* Font weights */
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* Line heights */
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* Radius */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+  --radius-circle: 50%;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(44, 24, 16, 0.05);
+  --shadow-sm: 0 1px 3px rgba(44, 24, 16, 0.08);
+  --shadow-md: 0 4px 12px rgba(44, 24, 16, 0.12);
+  --shadow-lg: 0 8px 24px rgba(44, 24, 16, 0.16);
+  --shadow-xl: 0 16px 48px rgba(44, 24, 16, 0.2);
+  --shadow-inner: inset 0 2px 4px rgba(44, 24, 16, 0.06);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 400ms ease;
+  --transition-bounce: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Z-index scale */
+  --z-base: 1;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-banner: 600;
+
+  /* Layout */
+  --header-height: 60px;
+  --cart-bar-height: 64px;
+  --max-width: 1200px;
+  --max-width-sm: 640px;
+  --max-width-md: 768px;
+  --max-width-lg: 1024px;
+}
+
+/* ============================================
+   Dark Mode
+   ============================================ */
+[data-theme="dark"] {
+  --color-bg: #1A120B;
+  --color-surface: #2C1810;
+  --color-text: #F5E6D3;
+  --color-text-light: #A08B78;
+  --color-primary-light: #7A5A45;
+  --color-primary-dark: #1A120B;
+  --color-secondary-light: #8B6E50;
+  --color-danger-light: #3D1E1E;
+  --color-success-light: #1E3D1E;
+  --color-warning-light: #3D2E1E;
+  --color-info-light: #1E2E3D;
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
